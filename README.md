@@ -1,6 +1,3 @@
-Sure! Here's the **exact copy-paste version** of the `README.md` file in your requested format:
-
-```
 # 🧠 Advanced Quiz App
 
 A sleek and responsive web-based quiz application built using **HTML**, **CSS**, and **JavaScript**. This project was developed by **Muhammad Umar Naheed** with a focus on UI/UX design, interactive learning, and personalized feedback for users.
@@ -18,21 +15,18 @@ A sleek and responsive web-based quiz application built using **HTML**, **CSS**,
 
 ## 📂 Project Structure
 
-```
 
 advanced-quiz-app/
 │
 ├── index.html         # Main HTML file with all embedded styles and scripts
 └── README.md          # This file
 
-````
 
 ## 🚀 How to Run
 
 1. **Download or Clone the Repository**  
    ```bash
    git clone https://github.com/yourusername/advanced-quiz-app.git
-````
 
 2. **Open in Browser**
    Just open `index.html` in any modern browser (Chrome, Firefox, Edge, etc.)
