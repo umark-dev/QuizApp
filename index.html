@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Advanced Quiz | Muhammad Umar Naheed</title>
+  <style>
+    :root {
+      --bg-color: #1e1e2f;
+      --text-color: white;
+      --card-color: #292943;
+      --accent: #00e676;
+    }
+
+    body.light-mode {
+      --bg-color: #f1f1f1;
+      --text-color: #111;
+      --card-color: #fff;
+      --accent: #007BFF;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    #quiz-container {
+      background: var(--card-color);
+      border-radius: 10px;
+      padding: 25px;
+      width: 95%;
+      max-width: 700px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    }
+
+    #score-timer {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      font-size: 1rem;
+    }
+
+    #progress-bar {
+      height: 10px;
+      background: #ccc;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    #progress {
+      height: 100%;
+      width: 0;
+      background: var(--accent);
+      transition: width 0.3s ease;
+    }
+
+    .question {
+      font-size: 1.3rem;
+      margin-bottom: 15px;
+    }
+
+    .option {
+      background: #444;
+      margin: 8px 0;
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    body.light-mode .option {
+      background: #e2e2e2;
+    }
+
+    .option:hover {
+      background: var(--accent);
+      color: #000;
+    }
+
+    .option.correct { background: #28a745; color: #fff; }
+    .option.wrong { background: #dc3545; color: #fff; }
+
+    #next-btn, #restart-btn, #toggle-mode {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 6px;
+      background: var(--accent);
+      color: #000;
+      cursor: pointer;
+    }
+
+    #feedback, #result {
+      margin-top: 15px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    #analytics {
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      h1 { font-size: 1.8rem; }
+      .question { font-size: 1.1rem; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Quiz App by Muhammad Umar Naheed</h1>
+  <button id="toggle-mode">🌙 Toggle Theme</button>
+
+  <div id="quiz-container">
+    <div id="score-timer">
+      <div>Score: <span id="score">0</span></div>
+      <div>Time: <span id="timer">30</span>s</div>
+    </div>
+
+    <div id="progress-bar"><div id="progress"></div></div>
+
+    <div class="question" id="question"></div>
+    <div id="options"></div>
+
+    <div id="feedback"></div>
+    <button id="next-btn" onclick="loadNext()">Next</button>
+    <div id="result"></div>
+    <div id="analytics"></div>
+    <button id="restart-btn" onclick="startQuiz()">Restart Quiz</button>
+  </div>
+
+  <!-- Sounds -->
+  <audio id="correctSound" src="https://www.soundjay.com/buttons/sounds/button-4.mp3"></audio>
+  <audio id="wrongSound" src="https://www.soundjay.com/buttons/sounds/button-10.mp3"></audio>
+
+  <script>
+    const questions = [
+      {
+        question: "HTML stands for?",
+        options: ["HyperText Markup Language", "HighText Machine Language", "Hyperloop Machine Language", "None"],
+        answer: "HyperText Markup Language"
+      },
+      {
+        question: "Who developed JavaScript?",
+        options: ["Brendan Eich", "Tim Berners-Lee", "James Gosling", "Guido van Rossum"],
+        answer: "Brendan Eich"
+      },
+      {
+        question: "Which company owns React?",
+        options: ["Google", "Facebook", "Microsoft", "Apple"],
+        answer: "Facebook"
+      },
+      {
+        question: "Which of these is a backend language?",
+        options: ["HTML", "CSS", "JavaScript", "PHP"],
+        answer: "PHP"
+      },
+      {
+        question: "What is CSS used for?",
+        options: ["Structure", "Database", "Design", "None"],
+        answer: "Design"
+      }
+    ];
+
+    let shuffledQuestions = [];
+    let currentQuestion = 0;
+    let score = 0;
+    let totalTime = 0;
+    let timeLeft = 30;
+    let attemptCount = localStorage.getItem("attemptCount") || 0;
+    let timer;
+    let answered = false;
+
+    const scoreEl = document.getElementById("score");
+    const timerEl = document.getElementById("timer");
+    const questionEl = document.getElementById("question");
+    const optionsEl = document.getElementById("options");
+    const resultEl = document.getElementById("result");
+    const feedbackEl = document.getElementById("feedback");
+    const progress = document.getElementById("progress");
+    const analytics = document.getElementById("analytics");
+
+    const correctSound = document.getElementById("correctSound");
+    const wrongSound = document.getElementById("wrongSound");
+
+    document.getElementById("restart-btn").style.display = "none";
+    document.getElementById("next-btn").style.display = "none";
+
+    document.getElementById("toggle-mode").onclick = () => {
+      document.body.classList.toggle("light-mode");
+    };
+
+    function shuffle(array) {
+      return array.sort(() => Math.random() - 0.5);
+    }
+
+    function startQuiz() {
+      attemptCount++;
+      localStorage.setItem("attemptCount", attemptCount);
+      shuffledQuestions = shuffle([...questions]);
+      currentQuestion = 0;
+      score = 0;
+      timeLeft = 30;
+      totalTime = 0;
+      answered = false;
+
+      scoreEl.textContent = score;
+      timerEl.textContent = timeLeft;
+      resultEl.textContent = "";
+      feedbackEl.textContent = "";
+      analytics.textContent = "";
+
+      document.getElementById("restart-btn").style.display = "none";
+      document.getElementById("next-btn").style.display = "none";
+
+      startTimer();
+      loadQuestion();
+    }
+
+    function startTimer() {
+      clearInterval(timer);
+      timer = setInterval(() => {
+        timeLeft--;
+        totalTime++;
+        timerEl.textContent = timeLeft;
+        if (timeLeft === 0) {
+          clearInterval(timer);
+          endQuiz();
+        }
+      }, 1000);
+    }
+
+    function loadQuestion() {
+      answered = false;
+      const q = shuffledQuestions[currentQuestion];
+      questionEl.textContent = Q${currentQuestion + 1}: ${q.question};
+      optionsEl.innerHTML = "";
+
+      q.options.forEach(opt => {
+        const btn = document.createElement("div");
+        btn.textContent = opt;
+        btn.className = "option";
+        btn.onclick = () => checkAnswer(opt, btn);
+        optionsEl.appendChild(btn);
+      });
+
+      updateProgress();
+    }
+
+    function checkAnswer(selected, btn) {
+      if (answered) return;
+      answered = true;
+
+      const correct = shuffledQuestions[currentQuestion].answer;
+      const options = document.querySelectorAll(".option");
+
+      options.forEach(option => {
+        option.onclick = null;
+        if (option.textContent === correct) option.classList.add("correct");
+        else if (option.textContent === selected) option.classList.add("wrong");
+      });
+
+      if (selected === correct) {
+        score++;
+        scoreEl.textContent = score;
+        feedbackEl.textContent = "✅ Correct!";
+        correctSound.play();
+      } else {
+        feedbackEl.textContent = ❌ Wrong! Correct: ${correct};
+        wrongSound.play();
+      }
+
+      document.getElementById("next-btn").style.display = "inline-block";
+    }
+
+    function loadNext() {
+      currentQuestion++;
+      feedbackEl.textContent = "";
+      document.getElementById("next-btn").style.display = "none";
+
+      if (currentQuestion < shuffledQuestions.length) {
+        loadQuestion();
+      } else {
+        endQuiz();
+      }
+    }
+
+    function endQuiz() {
+      clearInterval(timer);
+      questionEl.textContent = "";
+      optionsEl.innerHTML = "";
+      feedbackEl.textContent = "";
+      document.getElementById("restart-btn").style.display = "inline-block";
+
+      const percent = ((score / shuffledQuestions.length) * 100).toFixed(1);
+      let grade = percent >= 80 ? "🌟 Excellent" :
+                  percent >= 60 ? "👍 Good" :
+                  percent >= 40 ? "📚 Fair" : "😔 Try Again";
+
+      resultEl.innerHTML = <strong>Your Score: ${score} / ${shuffledQuestions.length}</strong><br>Total Time: ${totalTime}s;
+
+      analytics.innerHTML = `
+        🎯 Accuracy: ${percent}%<br>
+        📝 Grade: ${grade}<br>
+        🔁 Attempts: ${attemptCount}
+      `;
+    }
+
+    startQuiz();
+  </script>
+</body>
+</html>
