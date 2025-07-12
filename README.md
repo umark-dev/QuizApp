@@ -15,11 +15,11 @@ A sleek and responsive web-based quiz application built using **HTML**, **CSS**,
 
 ## 📂 Project Structure
 
-
-advanced-quiz-app/
-│
-├── index.html         # Main HTML file with all embedded styles and scripts
-└── README.md          # This file
+| File/Folder        | Description                                         |
+|--------------------|-----------------------------------------------------|
+| `advanced-quiz-app/` | Root project directory                            |
+| ├── `index.html`     | Main HTML file with all embedded styles and scripts |
+| └── `README.md`      | This file                                          |
 
 
 ## 🚀 How to Run
