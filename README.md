@@ -1,3 +1,6 @@
+Sure! Here's the **exact copy-paste version** of the `README.md` file in your requested format:
+
+```
 # 🧠 Advanced Quiz App
 
 A sleek and responsive web-based quiz application built using **HTML**, **CSS**, and **JavaScript**. This project was developed by **Muhammad Umar Naheed** with a focus on UI/UX design, interactive learning, and personalized feedback for users.
@@ -64,9 +67,7 @@ You can deploy this project on GitHub Pages, Netlify, or Vercel for instant acce
 
 > A passionate Web Developer and Designer dedicated to creating clean, interactive, and educational web applications.
 
----
-
 ```
 
-Let me know if you want me to generate a `README.md` file for download or include screenshots and deployment guide as well.
+You can now paste this directly into your `README.md` file. Let me know if you'd like to include a badge, version tag, or live link section!
 ```
