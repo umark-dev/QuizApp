@@ -246,7 +246,7 @@
     function loadQuestion() {
       answered = false;
       const q = shuffledQuestions[currentQuestion];
-      questionEl.textContent = Q${currentQuestion + 1}: ${q.question};
+      questionEl.textContent = 'Q${currentQuestion + 1}: ${q.question}';
       optionsEl.innerHTML = "";
 
       q.options.forEach(opt => {
@@ -279,7 +279,7 @@
         feedbackEl.textContent = "✅ Correct!";
         correctSound.play();
       } else {
-        feedbackEl.textContent = ❌ Wrong! Correct: ${correct};
+        feedbackEl.textContent =' ❌ Wrong! Correct: ${correct}';
         wrongSound.play();
       }
 
@@ -310,7 +310,7 @@
                   percent >= 60 ? "👍 Good" :
                   percent >= 40 ? "📚 Fair" : "😔 Try Again";
 
-      resultEl.innerHTML = <strong>Your Score: ${score} / ${shuffledQuestions.length}</strong><br>Total Time: ${totalTime}s;
+      resultEl.innerHTML = '<strong>Your Score: ${score} / ${shuffledQuestions.length}</strong><br>Total Time: ${totalTime}s';
 
       analytics.innerHTML = `
         🎯 Accuracy: ${percent}%<br>
